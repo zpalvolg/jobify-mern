@@ -1,7 +1,9 @@
+import {StatusCodes} from 'http-status-codes'
+
 const errorHandlerMiddleware = (err,req,res,next) => {
     console.log(err)
-    res.status(500).json({
-        msg: 'there was an error'
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        msg: err
     })
 }
 

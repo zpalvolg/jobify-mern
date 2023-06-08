@@ -1,4 +1,5 @@
 //express
+import 'express-async-errors'
 import express from 'express'
 //middleware
 import errorHandlerMiddleware from './middleware/error-handler.js'

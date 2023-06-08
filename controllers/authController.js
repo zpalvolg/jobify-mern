@@ -1,5 +1,10 @@
+import User from "../models/User.js"
+import {StatusCodes} from 'http-status-codes'
+
 const register = async (req,res) => {
-    res.send("register user")
+    //using express-async-errors we can skip try/catch and the error will be passed to errorHandlerMiddleware
+    const user = await User.create(req.body)
+    res.status(StatusCodes.CREATED).json({user})
 }
 
 const login = async (req,res) => {
