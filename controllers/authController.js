@@ -20,7 +20,41 @@ const register = async (req,res) => {
 }
 
 const login = async (req,res) => {
-    res.send("login user")
+    const {email, password } = req.body
+    
+    if (!email || !password){
+        res.status(StatusCodes.BAD_REQUEST).json({
+            msg: "Provide all values!"
+        })
+    }
+
+    const user = await User.findOne({email}).select('+password')
+
+    if (!user){
+        res.status(StatusCodes.UNAUTHORIZED).json({
+            msg: "Invalid Credentials!"
+        })
+    }
+
+    const isPasswordCorret = await user.comparePassword(password)
+
+    if (!isPasswordCorret){
+        res.status(StatusCodes.UNAUTHORIZED).json({
+            msg: "Invalid Credentials!"
+        })
+    }
+
+    //generate new token
+    const token = user.createJWT()
+
+    //hide password in response
+    user.password = undefined
+
+    res.status(StatusCodes.OK).json({
+        user
+        , token
+        , location: user.location
+    })
 }
 
 const updateUser = async (req,res) => {

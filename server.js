@@ -4,6 +4,7 @@ import express from 'express'
 //middleware
 import errorHandlerMiddleware from './middleware/error-handler.js'
 import notFoundMiddleware from './middleware/not-found.js'
+import morgan from 'morgan'
 //dotenv
 import dotenv from 'dotenv'
 //db
@@ -15,6 +16,10 @@ import jobRouter from './routes/jobRouter.js'
 dotenv.config()
 
 const app = express()
+
+if(process.env.NODE_ENV !== 'product'){
+    app.use(morgan('dev'))
+}
 
 app.use(express.json())
 
