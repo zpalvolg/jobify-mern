@@ -1,6 +1,8 @@
 import React, {useReducer, useContext} from 'react'
 import reducer from './reducer'
-import { DISPLAY_ALERT , CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR} from "./action"
+import { DISPLAY_ALERT , CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR
+,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR
+} from "./action"
 import axios from 'axios'
 
 const token = localStorage.getItem('token')
@@ -56,7 +58,7 @@ const AppProvider = ({children}) => {
             
             const {user, token, location} = response.data
 
-            console.log(user)
+            //console.log(user)
             
             dispatch({type:REGISTER_USER_SUCCESS
                 , payload:{user, token, location}
@@ -79,7 +81,40 @@ const AppProvider = ({children}) => {
         clearAlert()
     }
 
-    return <AppContext.Provider value={{...state, displayAlert, registerUser}}> {children} </AppContext.Provider>
+    const loginUser = async (currentUser) => {
+        dispatch({type:LOGIN_USER_BEGIN})
+        
+        try {
+            const response = await axios.post('/api/v1/auth/login',  currentUser);
+            
+            //console.log(response)
+            
+            const {user, token, location} = response.data
+
+            //console.log(user)
+            
+            dispatch({type:LOGIN_USER_SUCCESS
+                , payload:{user, token, location}
+            })
+
+            //local storage
+            addUserToLocalStorage({user, token, location})
+
+        } catch (error) {
+            //console.log(error.response)
+
+            //console.log(error.response.data.msg)
+
+            dispatch({type:LOGIN_USER_ERROR
+                , payload:{msg: error.response.data.msg}
+            })
+
+        }
+
+        clearAlert()
+    }
+
+    return <AppContext.Provider value={{...state, displayAlert, registerUser, loginUser}}> {children} </AppContext.Provider>
 }
 
 const useAppContext = () => {
