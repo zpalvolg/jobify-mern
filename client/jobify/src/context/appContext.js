@@ -1,7 +1,7 @@
 import React, {useReducer, useContext} from 'react'
 import reducer from './reducer'
 import { DISPLAY_ALERT , CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR
-,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, TOGGLE_SIDEBAR
+,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, LOGOUT_USER, TOGGLE_SIDEBAR
 } from "./action"
 import axios from 'axios'
 
@@ -115,11 +115,16 @@ const AppProvider = ({children}) => {
         clearAlert()
     }
 
+    const logoutUser = () => {
+        dispatch({type:LOGOUT_USER})
+        removeUserFromLocalStorage()
+    }
+
     const toggleSidebar = () => {
         dispatch({type:TOGGLE_SIDEBAR})
     }
 
-    return <AppContext.Provider value={{...state, displayAlert, registerUser, loginUser, toggleSidebar}}> {children} </AppContext.Provider>
+    return <AppContext.Provider value={{...state, displayAlert, registerUser, loginUser, logoutUser,toggleSidebar}}> {children} </AppContext.Provider>
 }
 
 const useAppContext = () => {
