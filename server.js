@@ -5,6 +5,7 @@ import express from 'express'
 import errorHandlerMiddleware from './middleware/error-handler.js'
 import notFoundMiddleware from './middleware/not-found.js'
 import morgan from 'morgan'
+import authenticateUser from './middleware/auth.js';
 //dotenv
 import dotenv from 'dotenv'
 //db
@@ -29,7 +30,7 @@ app.get('/', (req,res) => {
 
 //routes
 app.use('/api/v1/auth',authRouter)
-app.use('/api/v1/jobs',jobRouter)
+app.use('/api/v1/jobs', authenticateUser, jobRouter)
 
 //middleware
 app.use(notFoundMiddleware)
