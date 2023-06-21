@@ -43,7 +43,10 @@ const UserSchema = new mongoose.Schema({
 //Mongoose middleware 
 //pre-process before save
 UserSchema.pre('save',async function(){
+    if (!this.isModified('password')) return
+
     const salt = await bcrypt.genSalt(10);
+    
     this.password = await bcrypt.hash(this.password, salt)
 })
 
