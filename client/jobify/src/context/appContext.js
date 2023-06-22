@@ -1,7 +1,7 @@
 import React, {useReducer, useContext} from 'react'
 import reducer from './reducer'
 import { DISPLAY_ALERT , CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR
-,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, LOGOUT_USER, TOGGLE_SIDEBAR
+,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, LOGOUT_USER, TOGGLE_SIDEBAR, UPDATE_USER_BEGIN, UPDATE_USER_SUCCESS, UPDATE_USER_ERROR
 } from "./action"
 import axios from 'axios'
 
@@ -124,7 +124,35 @@ const AppProvider = ({children}) => {
         dispatch({type:TOGGLE_SIDEBAR})
     }
 
-    return <AppContext.Provider value={{...state, displayAlert, registerUser, loginUser, logoutUser,toggleSidebar}}> {children} </AppContext.Provider>
+    const updateUser = async (currentUser) => {
+        dispatch({ type: UPDATE_USER_BEGIN });
+
+        try {
+          const { data } = await axios.patch('/api/v1/auth/updateUser', currentUser, {
+            headers: {
+              Authorization: `Bearer ${state.token}`,
+            },
+          });
+          
+          const { user, location, token } = data;
+
+          dispatch({
+            type: UPDATE_USER_SUCCESS,
+            payload: { user, location, token },
+          });
+      
+          addUserToLocalStorage({ user, location, token });
+          
+        } catch (error) {
+            dispatch({
+              type: UPDATE_USER_ERROR,
+              payload: { msg: error.response.data.msg },
+            });
+          }
+          clearAlert();
+        };
+
+    return <AppContext.Provider value={{...state, displayAlert, registerUser, loginUser, logoutUser, toggleSidebar, updateUser}}> {children} </AppContext.Provider>
 }
 
 const useAppContext = () => {
