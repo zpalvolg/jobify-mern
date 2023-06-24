@@ -10,6 +10,7 @@ const user = localStorage.getItem('user')
 const location = localStorage.getItem('location')
 
 const initialState = {
+    //user related
     isLoading:false,
     showAlert:false,
     alertText:'',
@@ -19,6 +20,15 @@ const initialState = {
     userLocation: location || '',
     jobLocation: location || '',
     showSidebar: false,
+    //job related
+    isEditing: false,
+    editJobId: '',
+    position: '',
+    company: '',
+    jobTypeOptions: ['full-time', 'part-time', 'remote', 'internship'],
+    jobType: 'full-time',
+    statusOptions: ['pending', 'interview', 'declined'],
+    status: 'pending',
 }
 
 const AppContext = React.createContext()
