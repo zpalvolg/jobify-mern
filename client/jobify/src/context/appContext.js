@@ -1,7 +1,8 @@
 import React, {useReducer, useContext} from 'react'
 import reducer from './reducer'
 import { DISPLAY_ALERT , CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR
-,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, LOGOUT_USER, TOGGLE_SIDEBAR, UPDATE_USER_BEGIN, UPDATE_USER_SUCCESS, UPDATE_USER_ERROR
+,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, LOGOUT_USER, TOGGLE_SIDEBAR, UPDATE_USER_BEGIN
+, UPDATE_USER_SUCCESS, UPDATE_USER_ERROR, HANDLE_CHANGE, CLEAR_VALUES, CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS, CREATE_JOB_ERROR
 } from "./action"
 import axios from 'axios'
 
@@ -160,9 +161,56 @@ const AppProvider = ({children}) => {
             });
           }
           clearAlert();
-        };
+    };
 
-    return <AppContext.Provider value={{...state, displayAlert, registerUser, loginUser, logoutUser, toggleSidebar, updateUser}}> {children} </AppContext.Provider>
+    const handleChange = ({ name, value }) => {
+        dispatch({
+          type: HANDLE_CHANGE,
+          payload: { name, value },
+        })
+    }
+
+    const clearValues = () => {
+        dispatch({ type: CLEAR_VALUES })
+    }
+
+    const createJob = async () => {
+        dispatch({ type: CREATE_JOB_BEGIN });
+        try {
+          const { position, company, jobLocation, jobType, status } = state;
+      
+          await axios.post('/api/v1/jobs'
+          , {
+            company,
+            position,
+            jobLocation,
+            jobType,
+            status,
+          }, 
+          {
+            headers: {
+              Authorization: `Bearer ${state.token}`,
+            },
+          });
+
+          dispatch({
+            type: CREATE_JOB_SUCCESS,
+          });
+
+          // call function instead clearValues()
+          dispatch({ type: CLEAR_VALUES });
+
+        } catch (error) {
+          dispatch({
+            type: CREATE_JOB_ERROR,
+            payload: { msg: error.response.data.msg },
+          });
+        }
+        clearAlert();
+    };
+
+    return <AppContext.Provider value={{...state, displayAlert, registerUser, loginUser, logoutUser
+        , toggleSidebar, updateUser, handleChange, clearValues, createJob}}> {children} </AppContext.Provider>
 }
 
 const useAppContext = () => {
