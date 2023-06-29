@@ -3,7 +3,7 @@ import reducer from './reducer'
 import { DISPLAY_ALERT , CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR
 ,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, LOGOUT_USER, TOGGLE_SIDEBAR, UPDATE_USER_BEGIN
 , UPDATE_USER_SUCCESS, UPDATE_USER_ERROR, HANDLE_CHANGE, CLEAR_VALUES, CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS
-, CREATE_JOB_ERROR, GET_JOBS_BEGIN, GET_JOBS_SUCCESS
+, CREATE_JOB_ERROR, GET_JOBS_BEGIN, GET_JOBS_SUCCESS, SET_EDIT_JOB
 } from "./action"
 import axios from 'axios'
 
@@ -245,7 +245,11 @@ const AppProvider = ({children}) => {
     }
 
     const setEditJob = (id) => {
-      console.log(`set edit job : ${id}`)
+      dispatch({ type: SET_EDIT_JOB, payload: { id } })
+    }
+    
+    const editJob = () => {
+      console.log('edit job')
     }
 
     const deleteJob = (id) =>{
@@ -253,7 +257,8 @@ const AppProvider = ({children}) => {
     }
 
     return <AppContext.Provider value={{...state, displayAlert, registerUser, loginUser, logoutUser
-        , toggleSidebar, updateUser, handleChange, clearValues, createJob, getJobs, setEditJob, deleteJob}}> {children} </AppContext.Provider>
+        , toggleSidebar, updateUser, handleChange, clearValues, createJob, getJobs, setEditJob
+        , deleteJob, editJob}}> {children} </AppContext.Provider>
 }
 
 const useAppContext = () => {
