@@ -3,7 +3,7 @@ import reducer from './reducer'
 import { DISPLAY_ALERT , CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR
 ,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, LOGOUT_USER, TOGGLE_SIDEBAR, UPDATE_USER_BEGIN
 , UPDATE_USER_SUCCESS, UPDATE_USER_ERROR, HANDLE_CHANGE, CLEAR_VALUES, CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS
-, CREATE_JOB_ERROR, GET_JOBS_BEGIN, GET_JOBS_SUCCESS, SET_EDIT_JOB
+, CREATE_JOB_ERROR, GET_JOBS_BEGIN, GET_JOBS_SUCCESS, SET_EDIT_JOB, DELETE_JOB_BEGIN, EDIT_JOB_BEGIN , EDIT_JOB_SUCCESS, EDIT_JOB_ERROR
 } from "./action"
 import axios from 'axios'
 
@@ -215,8 +215,7 @@ const AppProvider = ({children}) => {
     };
 
     const getJobs = async () => {
-      let url = `/jobs`
-    
+
       dispatch({ type: GET_JOBS_BEGIN })
       
       try {
@@ -248,13 +247,57 @@ const AppProvider = ({children}) => {
       dispatch({ type: SET_EDIT_JOB, payload: { id } })
     }
     
-    const editJob = () => {
-      console.log('edit job')
-    }
+    const editJob = async () => {
+      dispatch({ type: EDIT_JOB_BEGIN });
+      try {
+        const { position, company, jobLocation, jobType, status } = state;
+    
+        await axios.patch(`/api/v1/jobs/${state.editJobId}`, {
+          company,
+          position,
+          jobLocation,
+          jobType,
+          status,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${state.token}`,
+          },
+        });
 
-    const deleteJob = (id) =>{
-      console.log(`delete : ${id}`)
-    }
+        dispatch({
+          type: EDIT_JOB_SUCCESS,
+        });
+
+        dispatch({ type: CLEAR_VALUES });
+
+      } catch (error) {
+        dispatch({
+          type: EDIT_JOB_ERROR,
+          payload: { msg: error.response.data.msg },
+        });
+      }
+
+      clearAlert();
+    };
+
+    const deleteJob = async (jobId) => {
+      dispatch({ type: DELETE_JOB_BEGIN });
+      
+      try {
+        await axios.delete(`/api/v1/jobs/${jobId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${state.token}`,
+          },
+        });
+
+        getJobs();
+
+      } catch (error) {
+        logoutUser();
+      }
+    };
 
     return <AppContext.Provider value={{...state, displayAlert, registerUser, loginUser, logoutUser
         , toggleSidebar, updateUser, handleChange, clearValues, createJob, getJobs, setEditJob
