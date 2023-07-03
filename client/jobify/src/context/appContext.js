@@ -3,7 +3,8 @@ import reducer from './reducer'
 import { DISPLAY_ALERT , CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS, REGISTER_USER_ERROR
 ,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, LOGOUT_USER, TOGGLE_SIDEBAR, UPDATE_USER_BEGIN
 , UPDATE_USER_SUCCESS, UPDATE_USER_ERROR, HANDLE_CHANGE, CLEAR_VALUES, CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS
-, CREATE_JOB_ERROR, GET_JOBS_BEGIN, GET_JOBS_SUCCESS, SET_EDIT_JOB, DELETE_JOB_BEGIN, EDIT_JOB_BEGIN , EDIT_JOB_SUCCESS, EDIT_JOB_ERROR
+, CREATE_JOB_ERROR, GET_JOBS_BEGIN, GET_JOBS_SUCCESS, SET_EDIT_JOB, DELETE_JOB_BEGIN, EDIT_JOB_BEGIN 
+, EDIT_JOB_SUCCESS, EDIT_JOB_ERROR, SHOW_STATS_BEGIN ,SHOW_STATS_SUCCESS
 } from "./action"
 import axios from 'axios'
 
@@ -35,6 +36,8 @@ const initialState = {
     totalJobs: 0,
     numOfPages: 1,
     page: 1,
+    stats: {},
+    monthlyApplications: [],
 }
 
 const AppContext = React.createContext()
@@ -299,9 +302,35 @@ const AppProvider = ({children}) => {
       }
     };
 
+    const showStats = async () => {
+      
+      dispatch({ type: SHOW_STATS_BEGIN })
+      
+      try {
+        const { data } = await axios.get('/api/v1/jobs/stats',
+        {
+          headers: {
+            Authorization: `Bearer ${state.token}`,
+          },
+        });
+      
+        dispatch({
+          type: SHOW_STATS_SUCCESS,
+          payload: {
+            stats: data.defaultStats,
+            monthlyApplications: data.monthlyApplications,
+          },
+        })
+      } catch (error) {
+        console.log(error.response)
+      }
+  
+      clearAlert()
+    };
+
     return <AppContext.Provider value={{...state, displayAlert, registerUser, loginUser, logoutUser
         , toggleSidebar, updateUser, handleChange, clearValues, createJob, getJobs, setEditJob
-        , deleteJob, editJob}}> {children} </AppContext.Provider>
+        , deleteJob, editJob, showStats}}> {children} </AppContext.Provider>
 }
 
 const useAppContext = () => {
