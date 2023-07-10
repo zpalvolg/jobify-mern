@@ -4,7 +4,7 @@ import { DISPLAY_ALERT , CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS
 ,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, LOGOUT_USER, TOGGLE_SIDEBAR, UPDATE_USER_BEGIN
 , UPDATE_USER_SUCCESS, UPDATE_USER_ERROR, HANDLE_CHANGE, CLEAR_VALUES, CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS
 , CREATE_JOB_ERROR, GET_JOBS_BEGIN, GET_JOBS_SUCCESS, SET_EDIT_JOB, DELETE_JOB_BEGIN, EDIT_JOB_BEGIN 
-, EDIT_JOB_SUCCESS, EDIT_JOB_ERROR, SHOW_STATS_BEGIN ,SHOW_STATS_SUCCESS, CLEAR_FILTERS
+, EDIT_JOB_SUCCESS, EDIT_JOB_ERROR, SHOW_STATS_BEGIN ,SHOW_STATS_SUCCESS, CLEAR_FILTERS, CHANGE_PAGE
 } from "./action"
 import axios from 'axios'
 
@@ -230,9 +230,9 @@ const AppProvider = ({children}) => {
 
     const getJobs = async () => {
 
-      const { search, searchStatus, searchType, sort } = state;
+      const { page, search, searchStatus, searchType, sort } = state;
 
-      let url = `/api/v1/jobs?status=${searchStatus}&jobType=${searchType}&sort=${sort}`;
+      let url = `/api/v1/jobs?page=${page}&status=${searchStatus}&jobType=${searchType}&sort=${sort}`;
 
       if (search) {
         url = url + `&search=${search}`;
@@ -345,9 +345,13 @@ const AppProvider = ({children}) => {
       dispatch({ type: CLEAR_FILTERS });
     };
 
+    const changePage = (page) => {
+      dispatch({ type: CHANGE_PAGE, payload: { page } })
+    }
+
     return <AppContext.Provider value={{...state, displayAlert, registerUser, loginUser, logoutUser
         , toggleSidebar, updateUser, handleChange, clearValues, createJob, getJobs, setEditJob
-        , deleteJob, editJob, showStats, clearFilters}}> {children} </AppContext.Provider>
+        , deleteJob, editJob, showStats, clearFilters, changePage}}> {children} </AppContext.Provider>
 }
 
 const useAppContext = () => {

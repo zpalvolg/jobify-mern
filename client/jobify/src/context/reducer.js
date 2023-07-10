@@ -2,7 +2,7 @@ import { DISPLAY_ALERT , CLEAR_ALERT, REGISTER_USER_BEGIN, REGISTER_USER_SUCCESS
 ,LOGIN_USER_BEGIN, LOGIN_USER_SUCCESS, LOGIN_USER_ERROR, LOGOUT_USER, TOGGLE_SIDEBAR, UPDATE_USER_BEGIN, UPDATE_USER_SUCCESS
 , UPDATE_USER_ERROR, HANDLE_CHANGE, CLEAR_VALUES,CREATE_JOB_BEGIN, CREATE_JOB_SUCCESS, CREATE_JOB_ERROR
 , GET_JOBS_BEGIN, GET_JOBS_SUCCESS, SET_EDIT_JOB, DELETE_JOB_BEGIN ,EDIT_JOB_BEGIN , EDIT_JOB_SUCCESS
-, EDIT_JOB_ERROR , SHOW_STATS_BEGIN ,SHOW_STATS_SUCCESS, CLEAR_FILTERS
+, EDIT_JOB_ERROR , SHOW_STATS_BEGIN ,SHOW_STATS_SUCCESS, CLEAR_FILTERS, CHANGE_PAGE
 } from "./action"
 
 import { initialState } from "./appContext"
@@ -106,7 +106,7 @@ const reducer = (state, action) => {
     }
 
     if (action.type === HANDLE_CHANGE) {
-        return { ...state, [action.payload.name]: action.payload.value };
+        return { ...state, page: 1, [action.payload.name]: action.payload.value };
     }
 
     if (action.type === CLEAR_VALUES) {
@@ -223,6 +223,10 @@ const reducer = (state, action) => {
           searchType: 'all',
           sort: 'latest',
         };
+    }
+
+    if (action.type === CHANGE_PAGE) {
+        return { ...state, page: action.payload.page };
     }
 
     throw new Error(`no such action : ${action.type}`)
