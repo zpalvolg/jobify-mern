@@ -17,6 +17,10 @@ import jobRouter from './routes/jobRouter.js'
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import path from 'path';
+//secure packages
+import helmet from 'helmet';
+import xss from 'xss-clean';
+import mongoSanitize from 'express-mongo-sanitize';
 
 dotenv.config()
 
@@ -27,6 +31,10 @@ if(process.env.NODE_ENV !== 'product'){
 }
 
 app.use(express.json())
+//secure packages
+app.use(helmet());
+app.use(xss());
+app.use(mongoSanitize());
 
 //deploy
 const __dirname = dirname(fileURLToPath(import.meta.url));
