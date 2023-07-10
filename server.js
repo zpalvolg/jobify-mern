@@ -13,6 +13,10 @@ import connectDB from './db/connect.js'
 //routes
 import authRouter from './routes/authRouter.js'
 import jobRouter from './routes/jobRouter.js'
+//deployment
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 dotenv.config()
 
@@ -24,13 +28,19 @@ if(process.env.NODE_ENV !== 'product'){
 
 app.use(express.json())
 
-app.get('/', (req,res) => {
-    res.send("welcome")
-})
+//deploy
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+app.use(express.static(path.resolve(__dirname, './client/jobify/build')));
 
 //routes
 app.use('/api/v1/auth',authRouter)
 app.use('/api/v1/jobs', authenticateUser, jobRouter)
+
+//deploy (after routes, use this to cover other 'get' methods)
+app.get('*', function (request, response) {
+    response.sendFile(path.resolve(__dirname, './client/jobify/build', 'index.html'));
+});
 
 //middleware
 app.use(notFoundMiddleware)
